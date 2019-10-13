@@ -4,6 +4,9 @@ nltk.download('wordnet')
 
 
 def preprocess_data(comments):
+    if type(comments) != 'list':
+        comments = [comments]
+
     stemmer = nltk.stem.WordNetLemmatizer()
     preprocessed_comments = []
 
