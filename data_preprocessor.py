@@ -20,12 +20,12 @@ def preprocess_data(comments):
         comment = re.sub(r'your submission((.|\n)*)\*i am a((.|\n)*)to=\/r\/|\) if you have(.+?)\.\*', ' ', comment)
         # removing 'i am a bot...'
         comment = re.sub(r'\*i am a((.|\n)*)to=\/r\/|\) if you have(.+?)\.\*', ' ', comment)
-        # Removing prefixed '&gt;', '&lt;', '&amp', 'tl;dr', '/r/', '/u/', 'http', 'https', 'www', 'com',
+        # Removing prefixed '&gt;', '&lt;', '&amp', 'tl;dr', '/r/', '/u/', '_', 'http', 'https', 'www', 'com',
         #                   'youtube.com/watch', 'youtu.be'
         #                   'Very short discussion posts are usually a sign...'
         #                   'all numbers'
         comment = re.sub(
-            r'&gt;|&lt;|&amp;|tl;dr|quot|https|http|www|\.com|np\.reddit|reddit|youtube\.com/watch|youtu\.be|/\S/|\d+|very short discussion((.|\n)*)the bot\.|this is ((.|\n)*)original]',
+            r'&gt;|&lt;|&amp;|tl;dr|quot|https|http|www|_|\.com|np\.reddit|reddit|youtube\.com/watch|youtu\.be|/\S/|\d+|very short discussion((.|\n)*)the bot\.|this is ((.|\n)*)original]',
             ' ', comment)
         # Remove all the special characters
         comment = re.sub(r'\W', ' ', comment)
@@ -45,6 +45,10 @@ def preprocess_data(comments):
         comment = re.sub(r'^[a-zA-Z]\s+', ' ', comment)
         # Remove two letters words from the start
         comment = re.sub(r'^[a-zA-Z][a-zA-Z]\s+', ' ', comment)
+        # Remove single characters from the end
+        comment = re.sub(r'\s+[a-zA-Z]$', ' ', comment)
+        # Remove two letters words from the end
+        comment = re.sub(r'\s+[a-zA-Z][a-zA-Z]$', ' ', comment)
 
         # Substituting multiple spaces with single space
         comment = re.sub(r'\s+', ' ', comment, flags=re.I)
