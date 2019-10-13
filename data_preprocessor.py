@@ -39,7 +39,6 @@ def preprocess_data(comments):
         comment = [stemmer.lemmatize(word, 'v') for word in comment]
         comment = ' '.join(comment)
         ############################################################
-        comment = re.sub(r'', '', comment)
         # remove all single characters
         comment = re.sub(r'\s+[a-zA-Z]\s+', ' ', comment)
         # remove all two letters words
