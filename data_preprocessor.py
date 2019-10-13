@@ -1,11 +1,22 @@
 import re
 import nltk
+from contractions import contractions_dict
 nltk.download('wordnet')
 
 
+def expand_contractions(text):
+    text_ = []
+    for word in text.split():
+        if word in contractions_dict:
+            text_.append(contractions_dict[word])
+        else:
+            text_.append(word)
+    return ' '.join(text_)
+
+
 def preprocess_data(comments):
-    if type(comments) != 'list':
-        comments = [comments]
+    # if type(comments) != 'list':
+    #     comments = [comments]
 
     stemmer = nltk.stem.WordNetLemmatizer()
     preprocessed_comments = []
@@ -30,6 +41,10 @@ def preprocess_data(comments):
         comment = re.sub(
             r'&gt;|&lt;|&amp;|tl;dr|quot|https|http|www|_|\.com|np\.reddit|reddit|youtube\.com/watch|youtu\.be|/\S/|\d+|very short discussion((.|\n)*)the bot\.|this is ((.|\n)*)original]',
             ' ', comment)
+
+        # contraction
+        comment = expand_contractions(comment)
+
         # Remove all the special characters
         comment = re.sub(r'\W', ' ', comment)
         # Lemmatization
@@ -51,6 +66,9 @@ def preprocess_data(comments):
         comment = re.sub(r'\s+[a-zA-Z]$', ' ', comment)
         # Remove two letters words from the end
         comment = re.sub(r'\s+[a-zA-Z][a-zA-Z]$', ' ', comment)
+        # TODO: fix
+        # Remove characters which are not contained in the ASCII character set
+        # comment = re.sub(r'[ ^\x00 -\x7F]+', ' ', comment)
 
         # Substituting multiple spaces with single space
         comment = re.sub(r'\s+', ' ', comment, flags=re.I)

@@ -44,15 +44,15 @@ def main():
     print('7294 => {0}\n'.format(X[7294]))
 
     # ngram_range=(1, 2)
-    # vectorizer = CountVectorizer(max_features=5000, min_df=2, max_df=0.95, stop_words=stopwords.words('english'))
-    # X = vectorizer.fit(X)
+    vectorizer = CountVectorizer(max_features=5000, min_df=2, max_df=0.95, stop_words=stopwords.words('english'))
+    X = vectorizer.fit(X)
 
 
-    tfidfconverter = TfidfVectorizer(max_features = 2000, min_df=2, max_df=0.95, stop_words=stopwords.words('english'))
-    X = tfidfconverter.fit_transform(X).toarray()
+    # tfidfconverter = TfidfVectorizer(max_features = 2000, min_df=2, max_df=0.95, stop_words=stopwords.words('english'))
+    # X = tfidfconverter.fit_transform(X).toarray()
 
     # print(X.shape)
-    # print(X.get_feature_names())
+    print(X.get_feature_names())
     print('train_test_split')
     # X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=0)
     # X_train, X_test, y_train, y_test = split_dataset(X, y, 0.8)
@@ -62,14 +62,14 @@ def main():
     classifier = tree.DecisionTreeClassifier()
 
     # k-folds
-    kf = KFold(n_splits=5)
-    for train_index, test_index in kf.split(X):
-        print("TRAIN:", train_index, "TEST:", test_index)
-        X_train, X_test = X[train_index], X[test_index]
-        y_train, y_test = y[train_index], y[test_index]
-        classifier.fit(X_train, y_train)
-        y_pred = classifier.predict(X_test)
-        print('accuracy:{0}'.format(np.mean(y_test == y_pred)))
+    # kf = KFold(n_splits=5)
+    # for train_index, test_index in kf.split(X):
+    #     print("TRAIN:", train_index, "TEST:", test_index)
+    #     X_train, X_test = X[train_index], X[test_index]
+    #     y_train, y_test = y[train_index], y[test_index]
+    #     classifier.fit(X_train, y_train)
+    #     y_pred = classifier.predict(X_test)
+    #     print('accuracy:{0}'.format(np.mean(y_test == y_pred)))
 
     # # print('Decision trees')
     # # classifier = tree.DecisionTreeClassifier()
