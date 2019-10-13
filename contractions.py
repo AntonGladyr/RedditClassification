@@ -118,7 +118,7 @@ contractions_dict = {
 "you've": "you have",
 "r": "are",
 "re": "are",
-"fk", "fuck",
+"fk": "fuck",
 "lemme": "let me",
 "gimme": "give me"
 }
