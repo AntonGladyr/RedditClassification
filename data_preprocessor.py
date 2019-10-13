@@ -23,20 +23,29 @@ def preprocess_data(comments):
         # Removing prefixed '&gt;', '&lt;', '&amp', 'tl;dr', '/r/', '/u/', 'http', 'https', 'www', 'com',
         #                   'youtube.com/watch', 'youtu.be'
         #                   'Very short discussion posts are usually a sign...'
+        #                   'all numbers'
         comment = re.sub(
-            r'&gt;|&lt;|&amp;|tl;dr|https|http|www|\.com|np\.reddit|reddit|youtube\.com/watch|youtu\.be|/\S/|very short discussion((.|\n)*)the bot\.|this is ((.|\n)*)original]',
+            r'&gt;|&lt;|&amp;|tl;dr|quot|https|http|www|\.com|np\.reddit|reddit|youtube\.com/watch|youtu\.be|/\S/|\d+|very short discussion((.|\n)*)the bot\.|this is ((.|\n)*)original]',
             ' ', comment)
         # Remove all the special characters
         comment = re.sub(r'\W', ' ', comment)
         # Lemmatization
+        # TODO: fix this part of code for lemmatizing
         comment = comment.split()
+        comment = [stemmer.lemmatize(word) for word in comment]
         comment = [stemmer.lemmatize(word, 'v') for word in comment]
         comment = ' '.join(comment)
+        ############################################################
         comment = re.sub(r'', '', comment)
         # remove all single characters
         comment = re.sub(r'\s+[a-zA-Z]\s+', ' ', comment)
+        # remove all two letters words
+        comment = re.sub(r'\s+[a-zA-Z][a-zA-Z]\s+', ' ', comment)
         # Remove single characters from the start
-        comment = re.sub(r'\^[a-zA-Z]\s+', ' ', comment)
+        comment = re.sub(r'^[a-zA-Z]\s+', ' ', comment)
+        # Remove two letters words from the start
+        comment = re.sub(r'^[a-zA-Z][a-zA-Z]\s+', ' ', comment)
+
         # Substituting multiple spaces with single space
         comment = re.sub(r'\s+', ' ', comment, flags=re.I)
         preprocessed_comments.append(comment)

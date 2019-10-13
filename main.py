@@ -43,7 +43,7 @@ def main():
     print('12916 => {0}\n'.format(X[12916]))
     print('7294 => {0}\n'.format(X[7294]))
 
-    vectorizer = CountVectorizer(max_features=5000, min_df=2, max_df=0.95, stop_words=stopwords.words('english'))
+    vectorizer = CountVectorizer(ngram_range=(1, 2), max_features=5000, min_df=2, max_df=0.95, stop_words=stopwords.words('english'))
     X = vectorizer.fit(X)
 
 
