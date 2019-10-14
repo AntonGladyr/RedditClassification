@@ -115,11 +115,15 @@ contractions_dict = {
 "you'll": "you will",
 "you'll've": "you will have",
 "you're": "you are",
+"youre": "you are",
 "you've": "you have",
 "r": "are",
 "re": "are",
 "fk": "fuck",
 "lemme": "let me",
 "gimme": "give me",
-"woulndnt": "would not"
+"wouldnt": "would not",
+"wasnt": "was not",
+"werent": "were not",
+"wont": "will not"
 }

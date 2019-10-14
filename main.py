@@ -4,9 +4,10 @@ import numpy as np
 from data_reader import read_data
 from data_preprocessor import preprocess_data
 from sklearn.feature_extraction.text import TfidfVectorizer
-import nltk
-nltk.download('stopwords')
-from nltk.corpus import stopwords
+# import nltk
+# nltk.download('stopwords')
+# from nltk.corpus import stopwords
+from sklearn.feature_extraction import stop_words
 from sklearn.model_selection import train_test_split
 from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import accuracy_score
@@ -14,6 +15,9 @@ from sklearn import preprocessing
 from sklearn import tree
 from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.model_selection import KFold
+from sklearn import decomposition
+from scipy.sparse import csr_matrix
+from sklearn import svm
 
 REDDIT_TRAIN_PATH = 'data_sources/reddit_train.csv'
 REDDIT_TEST_PATH = 'data_sources/reddit_test.csv'
@@ -44,32 +48,45 @@ def main():
     print('7294 => {0}\n'.format(X[7294]))
 
     # ngram_range=(1, 2)
-    vectorizer = CountVectorizer(max_features=5000, min_df=2, max_df=0.95, stop_words=stopwords.words('english'))
-    X = vectorizer.fit(X)
+    # vectorizer = CountVectorizer(max_features=5000, min_df=2, max_df=0.95, stop_words=stopwords.words('english'))
+    # X = vectorizer.fit(X)
 
+    # stopwords.words('english')
+    # max_features=12000,
+    tfidfconverter = TfidfVectorizer(ngram_range=(1, 2), min_df=5, max_df=0.75, stop_words=stop_words.ENGLISH_STOP_WORDS)
+    X = tfidfconverter.fit_transform(X).toarray()
 
-    # tfidfconverter = TfidfVectorizer(max_features = 2000, min_df=2, max_df=0.95, stop_words=stopwords.words('english'))
-    # X = tfidfconverter.fit_transform(X).toarray()
+    print(tfidfconverter.get_feature_names())
+    print(X.shape)
 
+    X = csr_matrix(X)
+    print(X.shape)
+    # #PCA
+    # print('PCA')
+    # pca = decomposition.PCA(n_components=20)
+    # pca.fit(X)
+    # X = pca.transform(X)
     # print(X.shape)
-    print(X.get_feature_names())
+
+    # print(X.get_feature_names())
     print('train_test_split')
     # X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=0)
     # X_train, X_test, y_train, y_test = split_dataset(X, y, 0.8)
 
     print('LogisticRegression')
-    # classifier = LogisticRegression(random_state=0, solver='sag', multi_class='multinomial')
-    classifier = tree.DecisionTreeClassifier()
+    classifier = LogisticRegression(random_state=0, solver='saga', multi_class='multinomial')
+    # classifier = svm.SVC(gamma='scale', decision_function_shape='ovo', cache_size=500)
+    # classifier = tree.DecisionTreeClassifier()
 
     # k-folds
-    # kf = KFold(n_splits=5)
-    # for train_index, test_index in kf.split(X):
-    #     print("TRAIN:", train_index, "TEST:", test_index)
-    #     X_train, X_test = X[train_index], X[test_index]
-    #     y_train, y_test = y[train_index], y[test_index]
-    #     classifier.fit(X_train, y_train)
-    #     y_pred = classifier.predict(X_test)
-    #     print('accuracy:{0}'.format(np.mean(y_test == y_pred)))
+    kf = KFold(n_splits=5)
+    for train_index, test_index in kf.split(X):
+        print("TRAIN:", train_index, "TEST:", test_index)
+        X_train, X_test = X[train_index], X[test_index]
+        y_train, y_test = y[train_index], y[test_index]
+        classifier.fit(X_train, y_train)
+        y_pred = classifier.predict(X_test)
+        print('accuracy:{0}'.format(np.mean(y_test == y_pred)))
 
     # # print('Decision trees')
     # # classifier = tree.DecisionTreeClassifier()
