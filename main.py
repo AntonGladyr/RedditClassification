@@ -15,9 +15,11 @@ from sklearn import preprocessing
 from sklearn import tree
 from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.model_selection import KFold
+from sklearn import model_selection
 from sklearn import decomposition
 from scipy.sparse import csr_matrix
 from sklearn import svm
+from sklearn.decomposition import TruncatedSVD
 
 REDDIT_TRAIN_PATH = 'data_sources/reddit_train.csv'
 REDDIT_TEST_PATH = 'data_sources/reddit_test.csv'
@@ -38,21 +40,7 @@ def main():
     le = preprocessing.LabelEncoder()
     y = le.fit_transform(y)
     X = preprocess_data(X)
-    # examples of comments
-    print('2334 => {0}\n'.format(X[2334]))
-    print('752 => {0}\n'.format(X[752]))
-    print('89 => {0}\n'.format(X[89]))
-    print('1545 => {0}\n'.format(X[1545]))
-    print('2667 => {0}\n'.format(X[2667]))
-    print('12916 => {0}\n'.format(X[12916]))
-    print('7294 => {0}\n'.format(X[7294]))
 
-    # ngram_range=(1, 2)
-    # vectorizer = CountVectorizer(max_features=5000, min_df=2, max_df=0.95, stop_words=stopwords.words('english'))
-    # X = vectorizer.fit(X)
-
-    # stopwords.words('english')
-    # max_features=12000,
     tfidfconverter = TfidfVectorizer(ngram_range=(1, 2), min_df=5, max_df=0.75, stop_words=stop_words.ENGLISH_STOP_WORDS)
     X = tfidfconverter.fit_transform(X).toarray()
 
@@ -61,43 +49,27 @@ def main():
 
     X = csr_matrix(X)
     print(X.shape)
-    # #PCA
-    # print('PCA')
-    # pca = decomposition.PCA(n_components=20)
-    # pca.fit(X)
-    # X = pca.transform(X)
-    # print(X.shape)
+    # #TruncatedSVD
+    print('TruncatedSVD')
+    svd = TruncatedSVD(n_components=20, n_iter=7, random_state=42)
+    svd.fit(X)
 
-    # print(X.get_feature_names())
-    print('train_test_split')
-    # X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=0)
-    # X_train, X_test, y_train, y_test = split_dataset(X, y, 0.8)
+    models = [('LR', LogisticRegression(random_state=0, solver='saga', multi_class='multinomial')),
+              ('DTC', tree.DecisionTreeClassifier()),
+              ('SVM', svm.SVC(gamma='scale', decision_function_shape='ovo'))]
 
-    print('LogisticRegression')
-    classifier = LogisticRegression(random_state=0, solver='saga', multi_class='multinomial')
-    # classifier = svm.SVC(gamma='scale', decision_function_shape='ovo', cache_size=500)
-    # classifier = tree.DecisionTreeClassifier()
+    # evaluate each model in turn
+    results = []
+    names = []
+    scoring = 'accuracy'
 
-    # k-folds
-    kf = KFold(n_splits=5)
-    for train_index, test_index in kf.split(X):
-        print("TRAIN:", train_index, "TEST:", test_index)
-        X_train, X_test = X[train_index], X[test_index]
-        y_train, y_test = y[train_index], y[test_index]
-        classifier.fit(X_train, y_train)
-        y_pred = classifier.predict(X_test)
-        print('accuracy:{0}'.format(np.mean(y_test == y_pred)))
-
-    # # print('Decision trees')
-    # # classifier = tree.DecisionTreeClassifier()
-    # print('classifier.fit')
-    # classifier.fit(X_train, y_train)
-    # print('classifier.pred')
-    # y_pred = classifier.predict(X_test)
-    #
-    # print('accuracy')
-    # print('accuracy:{0}'.format(np.mean(y_test == y_pred)))
-    # print('sklearn accuracy score:{0}'.format(accuracy_score(y_test, y_pred)))
+    for name, model in models:
+        kfold = model_selection.KFold(n_splits=5)
+        cv_results = model_selection.cross_val_score(model, X, y, cv=kfold, scoring=scoring)
+        results.append(cv_results)
+        names.append(name)
+        msg = "%s: %f (%f)" % (name, cv_results.mean(), cv_results.std())
+        print(msg)
 
 
 if __name__ == '__main__':
