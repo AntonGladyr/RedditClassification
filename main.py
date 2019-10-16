@@ -2,7 +2,7 @@
 
 import numpy as np
 from data_reader import read_data
-from data_preprocessor import preprocess_data
+from data_preprocessor import preprocess_comment
 from sklearn.feature_extraction.text import TfidfVectorizer
 from nltk.corpus import stopwords
 from sklearn.feature_extraction import stop_words
@@ -37,11 +37,11 @@ def main():
     X, y = reddit_data[:, COMMENTS_INDEX], reddit_data[:, CATEGORIES_INDEX]
     le = preprocessing.LabelEncoder()
     y = le.fit_transform(y)
-    X = preprocess_data(X)
+    # X = preprocess_data(X)
 
     stopword_list = stop_words.ENGLISH_STOP_WORDS.union(stopwords.words('english'))
-    tfidfconverter = TfidfVectorizer(ngram_range=(1, 3), min_df=5, max_df=0.75,
-                                     stop_words=stopword_list)
+    tfidfconverter = TfidfVectorizer(ngram_range=(1, 2), min_df=5, max_df=0.75,
+                                     stop_words=stopword_list, preprocessor=preprocess_comment)
     X = tfidfconverter.fit_transform(X).toarray()
     with open('csvfile.txt', 'w') as f:
         for item in tfidfconverter.get_feature_names():

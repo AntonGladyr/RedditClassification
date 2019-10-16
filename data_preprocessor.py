@@ -45,7 +45,7 @@ def preprocess_comment(comment_input):
     #                   'Very short discussion posts are usually a sign...'
     #                   'all numbers'
     comment = re.sub(
-        r'&gt;|&lt;|&amp;|tl;dr|quot|https|http|www|_|\.com|np\.reddit|reddit|youtube\.com/watch|youtu\.be|/\S/|\d+|very short discussion((.|\n)*)the bot\.|this is ((.|\n)*)original]',
+        r'&gt;|&lt;|&amp;|tl;dr|quot|https|http|www|_|like|\.com|np\.reddit|reddit|youtube\.com/watch|youtu\.be|/\S/|\d+|very short discussion((.|\n)*)the bot\.|this is ((.|\n)*)original]',
         ' ', comment)
 
     # contraction
