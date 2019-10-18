@@ -18,6 +18,8 @@ from sklearn import decomposition
 from scipy.sparse import csr_matrix
 from sklearn import svm
 from sklearn.decomposition import TruncatedSVD
+from sklearn.naive_bayes import ComplementNB
+from sklearn.naive_bayes import MultinomialNB
 
 REDDIT_TRAIN_PATH = 'data_sources/reddit_train.csv'
 REDDIT_TEST_PATH = 'data_sources/reddit_test.csv'
@@ -65,7 +67,10 @@ def main():
     names = []
     scoring = 'accuracy'
     models = [('LR', LogisticRegression(random_state=0, solver='saga', multi_class='multinomial')),
-              ('DTC', tree.DecisionTreeClassifier())]
+              ('CNB', ComplementNB(alpha=4.0, class_prior=None, fit_prior=True, norm=False)),
+              ('MNB', MultinomialNB(alpha=0.5, fit_prior=True, class_prior=None))
+              ('DTC', tree.DecisionTreeClassifier())
+              ]
     results = []
     names = []
     # #TruncatedSVD

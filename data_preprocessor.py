@@ -65,15 +65,15 @@ def preprocess_comment(comment_input):
     # remove all single characters
     comment = re.sub(r'\s+[a-zA-Z]\s+', ' ', comment)
     # remove all two letters words
-    comment = re.sub(r'\s+[a-zA-Z][a-zA-Z]\s+', ' ', comment)
+    #comment = re.sub(r'\s+[a-zA-Z][a-zA-Z]\s+', ' ', comment)
     # Remove single characters from the start
     comment = re.sub(r'^[a-zA-Z]\s+', ' ', comment)
     # Remove two letters words from the start
-    comment = re.sub(r'^[a-zA-Z][a-zA-Z]\s+', ' ', comment)
+    #comment = re.sub(r'^[a-zA-Z][a-zA-Z]\s+', ' ', comment)
     # Remove single characters from the end
     comment = re.sub(r'\s+[a-zA-Z]$', ' ', comment)
     # Remove two letters words from the end
-    comment = re.sub(r'\s+[a-zA-Z][a-zA-Z]$', ' ', comment)
+    #comment = re.sub(r'\s+[a-zA-Z][a-zA-Z]$', ' ', comment)
     # TODO: fix
     # Remove characters which are not contained in the ASCII character set
     comment = re.sub(r'\s+[^\x00 -\x7F]+\s+', ' ', comment)
