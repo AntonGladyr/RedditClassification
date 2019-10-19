@@ -40,6 +40,10 @@ def main():
     ]
     ensemble = VotingClassifier(models)
     ensemble.fit(X, y)
+    results = model_selection.cross_val_score(ensemble, X, y, cv=skfold, scoring='accuracy', n_jobs=4)
+    print(results.mean())
+    
+    # predicting on test dataset
     reddit_data_test = read_data(REDDIT_TEST_PATH)
     X_test = reddit_data_test[:, COMMENTS_INDEX]
     X_test = tfidfconverter.transform(X_test).toarray()
@@ -50,8 +54,6 @@ def main():
     dataset_pred = reddit_data_test[:, 0:2]
     dataset_pred = np.hstack((dataset_pred, y_pred.reshape(-1, 1)))
     pd.DataFrame(dataset_pred).to_csv("submission.csv", header=['id', 'comments', 'subreddits'])
-    results = model_selection.cross_val_score(ensemble, X, y, cv=skfold, scoring='accuracy', n_jobs=4)
-    print(results.mean())
 
 if __name__ == '__main__':
     main()
