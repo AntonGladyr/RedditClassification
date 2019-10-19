@@ -2,22 +2,19 @@
 
 import numpy as np
 from data_reader import read_data
-from data_preprocessor import preprocess_comment
 from sklearn.feature_extraction.text import TfidfVectorizer
 from nltk.corpus import stopwords
-from sklearn.feature_extraction import stop_words
-from sklearn.model_selection import train_test_split
 from sklearn.linear_model import LogisticRegression
-from sklearn.metrics import accuracy_score
 from sklearn import preprocessing
-from sklearn import tree
-from sklearn.feature_extraction.text import CountVectorizer
-from sklearn.model_selection import KFold
+from data_preprocessor import preprocess_comment_simple
+from sklearn.ensemble import RandomForestClassifier
 from sklearn import model_selection
-from sklearn import decomposition
 from scipy.sparse import csr_matrix
-from sklearn import svm
-from sklearn.decomposition import TruncatedSVD
+from sklearn.ensemble import VotingClassifier
+from sklearn.naive_bayes import ComplementNB
+from sklearn.naive_bayes import MultinomialNB
+from sklearn.feature_extraction import stop_words
+import pandas as pd
 
 REDDIT_TRAIN_PATH = 'data_sources/reddit_train.csv'
 REDDIT_TEST_PATH = 'data_sources/reddit_test.csv'
@@ -36,68 +33,59 @@ def main():
     reddit_data = read_data(REDDIT_TRAIN_PATH)
     X, y = reddit_data[:, COMMENTS_INDEX], reddit_data[:, CATEGORIES_INDEX]
     le = preprocessing.LabelEncoder()
-    y = le.fit_transform(y)
-    # X = preprocess_data(X)
+    le.fit(y)
+    y = le.transform(y)
 
-    stopword_list = stop_words.ENGLISH_STOP_WORDS.union(stopwords.words('english'))
-    tfidfconverter = TfidfVectorizer(ngram_range=(1, 2), min_df=5, max_df=0.75,
-                                     stop_words=stopword_list, preprocessor=preprocess_comment)
+    # stopword_list = stop_words.ENGLISH_STOP_WORDS.union(stopwords.words('english'))
+
+    tfidfconverter = TfidfVectorizer(stop_words=stop_words.ENGLISH_STOP_WORDS,
+                                     preprocessor=preprocess_comment_simple)
     X = tfidfconverter.fit_transform(X).toarray()
-    with open('csvfile.txt', 'w') as f:
-        for item in tfidfconverter.get_feature_names():
-            f.write("%s\n" % item)
-    # print(tfidfconverter.get_feature_names())
-    print(X.shape)
 
     X = csr_matrix(X)
-    print('Normalized features')
-    X = preprocessing.normalize(X)
     print(X.shape)
-    # print('Logistic regression, whole dataset')
-    # skfold = model_selection.StratifiedKFold(n_splits=5)
-    # model = LogisticRegression(random_state=0, solver='saga', multi_class='multinomial')
-    # cv_result = model_selection.cross_val_score(model, X, y, cv=skfold, scoring='accuracy')
-    # msg = "%s: %f" % ('Logistic regression', cv_result.mean())
-    # print(msg)
+    print('RandomForestClassifier, whole dataset')
+    skfold = model_selection.StratifiedKFold(n_splits=20)
+    model = RandomForestClassifier(n_estimators=100)
+    cv_result = model_selection.cross_val_score(model, X, y, cv=skfold, scoring='accuracy')
+    msg = "%s: %f" % ('Logistic regression', cv_result.mean())
+    print(msg)
 
-    print('------------')
-    results = []
-    names = []
-    scoring = 'accuracy'
-    models = [('LR', LogisticRegression(random_state=0, solver='saga', multi_class='multinomial')),
-              ('DTC', tree.DecisionTreeClassifier())]
-    results = []
-    names = []
-    # #TruncatedSVD
-    # print('TruncatedSVD n_components={0}'.format(700))
-    # svd = TruncatedSVD(n_components=700)
-    # X_truncated = svd.fit_transform(X)
-    skfold = model_selection.StratifiedKFold(n_splits=5)
-    for name, model in models:
-        cv_results = model_selection.cross_val_score(model, X, y, cv=skfold, scoring=scoring)
-        results.append(cv_results)
-        names.append(name)
-        msg = "%s: %f (%f)" % (name, cv_results.mean(), cv_results.std())
-        print(msg)
-        # X = csr_matrix(X)
-        # print(X.shape)
+    # ('RFC', RandomForestClassifier(n_estimators=400, criterion='entropy'))
+    # models = [('LR', LogisticRegression(random_state=0, solver='saga', multi_class='multinomial'))]
 
-    # models = [('LR', LogisticRegression(random_state=0, solver='saga', multi_class='multinomial')),
-    #           ('DTC', tree.DecisionTreeClassifier()),
-    #           ('SVM', svm.SVC(kernel='linear'))]
-    #
-    # # evaluate each model in turn
-    # results = []
-    # names = []
-    # scoring = 'accuracy'
-    #
-    # for name, model in models:
-    #     kfold = model_selection.KFold(n_splits=5)
-    #     cv_results = model_selection.cross_val_score(model, X, y, cv=kfold, scoring=scoring)
-    #     results.append(cv_results)
-    #     names.append(name)
-    #     msg = "%s: %f (%f)" % (name, cv_results.mean(), cv_results.std())
-    #     print(msg)
+    # print('Bagging Classifier')
+    # skfold = model_selection.StratifiedKFold(n_splits=7)
+    # cart = RandomForestClassifier(n_estimators=100, criterion='entropy')
+    # model = BaggingClassifier(base_estimator=cart, n_estimators=5)
+    # results = model_selection.cross_val_score(model, X, y, cv=skfold, n_jobs=4)
+    # print(results.mean())
+
+    #('RFC', RandomForestClassifier(n_estimators=100))
+    skfold = model_selection.StratifiedKFold(n_splits=20)
+    print('Ensemble of LR, NB, MNB')
+    models = [
+        ('LR', LogisticRegression(random_state=0, solver='saga', multi_class='multinomial')),
+        ('CNB', ComplementNB(alpha=4.0, class_prior=None, fit_prior=True, norm=False)),
+        ('MNB', MultinomialNB(alpha=0.4, fit_prior=True, class_prior=None))
+    ]
+    ensemble = VotingClassifier(models)
+    ensemble.fit(X, y)
+    reddit_data_test = read_data(REDDIT_TEST_PATH)
+    X_test = reddit_data_test[:, COMMENTS_INDEX]
+    X_test = tfidfconverter.transform(X_test).toarray()
+    X_test = csr_matrix(X_test)
+    X_test = preprocessing.normalize(X_test)
+    y_pred = ensemble.predict(X_test)
+    y_pred = le.inverse_transform(y_pred)
+    dataset_pred = reddit_data_test[:, 0:2]
+    dataset_pred = np.hstack((dataset_pred, y_pred.reshape(-1, 1)))
+    # result = np.asarray(dataset_pred)
+    # np.savetxt("submission.csv", result, delimiter=",", header="id,comments,subreddits", fmt=["%i", "%s", "%s"], comments='')
+    pd.DataFrame(dataset_pred).to_csv("submission.csv", header=['id', 'comments', 'subreddits'])
+    results = model_selection.cross_val_score(ensemble, X, y, cv=skfold, scoring='accuracy', n_jobs=4)
+    print(results.mean())
+
 
 
 if __name__ == '__main__':

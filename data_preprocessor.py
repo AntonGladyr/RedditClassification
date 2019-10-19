@@ -54,26 +54,20 @@ def preprocess_comment(comment_input):
     # Remove all the special characters
     comment = re.sub(r'\W', ' ', comment)
     # Lemmatization
-    # TODO: fix this part of code for lemmatizing
     comment = [lemmatizer.lemmatize(w, get_wordnet_pos(w)) for w in nltk.word_tokenize(comment)]
     comment = ' '.join(comment)
-    # comment = comment.split()
-    # comment = [stemmer.lemmatize(word) for word in comment]
-    # comment = [stemmer.lemmatize(word, 'v') for word in comment]
-    # comment = ' '.join(comment)
-    ############################################################
     # remove all single characters
     comment = re.sub(r'\s+[a-zA-Z]\s+', ' ', comment)
     # remove all two letters words
-    comment = re.sub(r'\s+[a-zA-Z][a-zA-Z]\s+', ' ', comment)
+    # comment = re.sub(r'\s+[a-zA-Z][a-zA-Z]\s+', ' ', comment)
     # Remove single characters from the start
     comment = re.sub(r'^[a-zA-Z]\s+', ' ', comment)
     # Remove two letters words from the start
-    comment = re.sub(r'^[a-zA-Z][a-zA-Z]\s+', ' ', comment)
+    # comment = re.sub(r'^[a-zA-Z][a-zA-Z]\s+', ' ', comment)
     # Remove single characters from the end
     comment = re.sub(r'\s+[a-zA-Z]$', ' ', comment)
     # Remove two letters words from the end
-    comment = re.sub(r'\s+[a-zA-Z][a-zA-Z]$', ' ', comment)
+    # comment = re.sub(r'\s+[a-zA-Z][a-zA-Z]$', ' ', comment)
     # TODO: fix
     # Remove characters which are not contained in the ASCII character set
     comment = re.sub(r'\s+[^\x00 -\x7F]+\s+', ' ', comment)
@@ -82,6 +76,13 @@ def preprocess_comment(comment_input):
     comment = re.sub(r'\s+', ' ', comment, flags=re.I)
 
     return comment
+
+def preprocess_comment_simple(comment):
+    comment = comment.lower()
+    comment = re.sub(r'\W', ' ', comment)
+    comment = re.sub(r'\s+', ' ', comment)
+    return comment
+
 
 def preprocess_data(comments):
     preprocessed_comments = []
