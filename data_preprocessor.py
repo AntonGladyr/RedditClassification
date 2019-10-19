@@ -5,7 +5,7 @@ nltk.download('wordnet')
 from nltk.corpus import wordnet
 
 
-def expand_contractions(text):
+def _expand_contractions(text):
     text_ = []
     for word in text.split():
         if word in contractions_dict:
@@ -15,7 +15,7 @@ def expand_contractions(text):
     return ' '.join(text_)
 
 
-def get_wordnet_pos(word):
+def _get_wordnet_pos(word):
     """Map POS tag to first character lemmatize() accepts"""
     tag = nltk.pos_tag([word])[0][1][0].upper()
     tag_dict = {"J": wordnet.ADJ,
@@ -83,11 +83,8 @@ def preprocess_comment(comment_input):
 
     return comment
 
-def preprocess_data(comments):
-    preprocessed_comments = []
-
-    for index in range(len(comments)):
-        print(index)
-        preprocessed_comments.append(preprocess_comment(comments[index]))
-
-    return preprocessed_comments
+def preprocess_comment_simple(comment):
+    comment = comment.lower()
+    comment = re.sub(r'\W', ' ', comment)
+    comment = re.sub(r'\s+', ' ', comment)
+    return comment
