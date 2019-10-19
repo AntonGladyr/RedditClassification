@@ -7,12 +7,10 @@ This mini-project implements models to analyze text from the website *Reddit* (h
 To run the project the following libraries must be installed:
    * numpy
    * nltk
-   * scikit-learn
-
-The following packages must be downloaded as well:
-   * wordnet - for removing morphological affixes from words (stemming)
+   * sklearn
+   * pandas
    
-To run the project use the following command:
+To run the project using sklearn models use the following command:
 
 ```
 python3 main.py
@@ -22,4 +20,10 @@ or
 
 ```
 ./main.py
+```
+
+To run the project using our in-house Bernoulli Naive Bayes use the following command:
+
+```
+python3 bernoulli_naive_bayes.py
 ```
