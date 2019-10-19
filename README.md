@@ -27,3 +27,5 @@ To run the project using our in-house Bernoulli Naive Bayes use the following co
 ```
 python3 bernoulli_naive_bayes.py
 ```
+
+NOTE: due to the large number of features used, the main.py script seem to not work properly on Linux platfroms. Running it on Mac should resolve the issue.
