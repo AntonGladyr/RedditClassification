@@ -10,6 +10,10 @@ from data_preprocessor import preprocess_comment_simple
 from sklearn.ensemble import RandomForestClassifier
 from sklearn import model_selection
 from scipy.sparse import csr_matrix
+from sklearn import svm
+from sklearn.decomposition import TruncatedSVD
+from sklearn.naive_bayes import ComplementNB
+from sklearn.naive_bayes import MultinomialNB
 from sklearn.ensemble import VotingClassifier
 from sklearn.naive_bayes import ComplementNB
 from sklearn.naive_bayes import MultinomialNB
