@@ -5,3 +5,5 @@ gen
 .ipynb_checkpoints
 __pycache__/
 .vscode/
+code.zip
+writeup.pdf
